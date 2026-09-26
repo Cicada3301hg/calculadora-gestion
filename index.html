@@ -476,8 +476,7 @@
     </div>
     <div class="titulo-app">
       <h1>Cicada <span>3301</span></h1>
-    </div>
-    <div class="pildora-porcentaje" id="pildoraIVA">
+    </div><div class="pildora-porcentaje" id="pildoraIVA">
       <label>IVA</label>
       <div class="contenedor-numero">
         <input type="text" id="inputIVA" placeholder="0" inputmode="decimal">
@@ -624,6 +623,33 @@
       activarLevitacion(grupos.venta);
       activarLevitacion(pildoraDescuento);
       activarLevitacion(pildoraIVA);
+    }
+
+    // ---------- GUARDAR Y RESTAURAR ESTADO DE LOS CAMPOS ----------
+    function guardarEstadoCampos() {
+      try {
+        const estado = {
+          paquete: inputP.value,
+          descuento: inputDescuento.value,
+          iva: inputIVA.value,
+          cantidad: inputC.value,
+          venta: inputV.value
+        };
+        localStorage.setItem('pulhEstadoCampos', JSON.stringify(estado));
+      } catch (e) {}
+    }
+
+    function restaurarEstadoCampos() {
+      try {
+        const data = localStorage.getItem('pulhEstadoCampos');
+        if (!data) return;
+        const estado = JSON.parse(data);
+        inputP.value = estado.paquete || '';
+        inputDescuento.value = estado.descuento || '';
+        inputIVA.value = estado.iva || '';
+        inputC.value = estado.cantidad || '';
+        inputV.value = estado.venta || '';
+      } catch (e) {}
     }
 
     function parseCRNumber(val) {
@@ -856,30 +882,37 @@
       applyLiveFormatting(this);
       activarLevitacion(grupos.paquete);
       scheduleCalculation();
+      guardarEstadoCampos();
     });
     inputDescuento.addEventListener('input', function() {
       activarLevitacion(pildoraDescuento);
       scheduleCalculation();
+      guardarEstadoCampos();
     });
     inputIVA.addEventListener('input', function() {
       activarLevitacion(pildoraIVA);
       scheduleCalculation();
+      guardarEstadoCampos();
     });
     inputC.addEventListener('input', function() {
       this.value = this.value.replace(/[^\d]/g, '');
       activarLevitacion(grupos.cantidad);
       scheduleCalculation();
+      guardarEstadoCampos();
     });
     inputV.addEventListener('input', function() {
       applyLiveFormatting(this);
       activarLevitacion(grupos.venta);
       scheduleCalculation();
+      guardarEstadoCampos();
     });
 
     cargarHistorial();
     actualizarVistaHistorial();
     limpiarUI();
+    restaurarEstadoCampos();
     actualizarTodasLasLevitaciones();
+    calcular();
 
   })();
 </script>
