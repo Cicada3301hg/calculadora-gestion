@@ -1,0 +1,20 @@
+{
+  "name": "Cicada 3301 - Calculadora",
+  "short_name": "Cicada 3301",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#EEF0F3",
+  "theme_color": "#EEF0F3",
+  "icons": [
+    {
+      "src": "icono-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icono-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
