@@ -362,11 +362,12 @@
     .barra-etiqueta.activa.verde { color: var(--green-deep); }
     .barra-etiqueta.activa.azul { color: var(--blue); }
 
-    .historial-container {
+    /* BOTÓN REGISTRAR (mismo estilo que el viejo Ver historial) */
+    .registrar-container {
       text-align: center;
       margin-top: 12px;
     }
-    .btn-historial {
+    .btn-registrar {
       position: relative;
       overflow: hidden;
       display: inline-flex;
@@ -386,71 +387,162 @@
         4px 4px 10px var(--shadow-dark-strong),
         9px 9px 24px var(--shadow-ambient-soft),
         inset 1px 1px 0 var(--highlight-edge);
-      transition: all 0.12s ease;
+      transition: all 0.2s ease;
       isolation: isolate;
     }
-    .btn-historial:active {
+    .btn-registrar:active {
       box-shadow:
         inset -2px -2px 6px var(--shadow-light),
         inset 2px 2px 6px var(--shadow-dark-strong);
       transform: translateY(1px);
     }
-    .btn-historial svg {
-      width: 15px;
-      height: 15px;
-      flex-shrink: 0;
+    .btn-registrar.guardado {
+      color: var(--green-deep);
+      box-shadow:
+        -4px -4px 10px var(--shadow-light),
+        4px 4px 10px var(--shadow-dark-strong),
+        0 0 0 rgba(0,0,0,0),
+        inset 1px 1px 0 var(--highlight-edge);
+    }
+    .btn-registrar:disabled {
+      cursor: default;
     }
 
-    .historial-lista {
+    /* MODAL DE REGISTRO */
+    .modal-overlay {
       display: none;
-      margin-top: 16px;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(43,47,54,0);
+      backdrop-filter: blur(0px);
+      -webkit-backdrop-filter: blur(0px);
+      z-index: 1100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      transition: background 0.4s ease, backdrop-filter 0.4s ease;
+    }
+    .modal-overlay.show {
+      display: flex;
+      background: rgba(43,47,54,0.35);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+    }
+    .modal-box {
       background: var(--card);
-      border-radius: 16px;
-      padding: 0;
-      max-height: 0;
-      overflow: hidden;
+      border-radius: 20px;
+      padding: 26px 22px;
+      max-width: 400px;
+      width: 100%;
       box-shadow:
-        -6px -6px 14px var(--shadow-light),
-        6px 6px 14px var(--shadow-dark-strong),
-        14px 14px 34px var(--shadow-ambient-soft);
-      transition: max-height 0.4s ease, padding 0.3s ease;
+        -6px -6px 16px var(--shadow-light),
+        6px 6px 16px var(--shadow-dark);
+      opacity: 0;
+      transform: scale(0.06);
+      transition: opacity 0.4s ease, transform 0.48s cubic-bezier(.2,1.2,.3,1);
     }
-    .historial-lista.abierto {
-      max-height: 340px;
-      overflow-y: auto;
-      padding: 14px 18px;
+    .modal-overlay.show .modal-box {
+      opacity: 1;
+      transform: scale(1);
     }
-    .item-historial {
+    .modal-title {
+      font-family: 'Fraunces', serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 18px;
+    }
+    .modal-field {
+      margin-bottom: 16px;
+    }
+    .modal-field label {
+      display: block;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .modal-field input {
+      width: 100%;
+      border: none;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      color: var(--ink);
+      outline: none;
+      box-shadow:
+        inset -2px -2px 6px var(--shadow-light),
+        inset 2px 2px 6px var(--shadow-dark);
+      transition: box-shadow 0.15s ease;
+    }
+    .modal-field input:focus {
+      box-shadow:
+        inset -3px -3px 8px var(--shadow-light),
+        inset 3px 3px 8px var(--shadow-dark);
+    }
+
+    .modal-resumen {
+      background: transparent;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 6px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      color: var(--ink-soft);
+      line-height: 1.7;
+    }
+    .modal-resumen .fila {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--divider);
-      font-size: 13px;
-      color: var(--ink);
     }
-    .item-historial:last-child { border-bottom: none; }
-    .item-historial .left {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 12.5px;
-      color: var(--ink-soft);
-    }
-    .item-historial .right {
-      font-family: 'IBM Plex Mono', monospace;
+    .modal-resumen .fila .k { color: var(--ink-soft); }
+    .modal-resumen .fila .v { color: var(--ink); font-weight: 600; }
+
+    .modal-actions { display: flex; gap: 10px; margin-top: 22px; }
+    .modal-btn {
+      position: relative;
+      overflow: hidden;
+      flex: 1;
+      border: none;
+      border-radius: 14px;
+      padding: 13px 0;
+      font-family: 'Inter', sans-serif;
       font-weight: 600;
-      color: var(--ink);
+      font-size: 14.5px;
+      cursor: pointer;
+      transition: all 0.12s ease;
+      isolation: isolate;
     }
-    .historial-empty {
-      text-align: center;
+    .modal-btn-cancelar {
+      background: var(--card);
       color: var(--ink-soft);
-      font-size: 13px;
-      padding: 15px;
+      box-shadow:
+        -3px -3px 8px var(--shadow-light),
+        3px 3px 8px var(--shadow-dark);
     }
-    .historial-lista::-webkit-scrollbar { width: 4px; }
-    .historial-lista::-webkit-scrollbar-track { background: transparent; }
-    .historial-lista::-webkit-scrollbar-thumb {
-      background: var(--shadow-dark);
-      border-radius: 4px;
+    .modal-btn-cancelar:active {
+      box-shadow:
+        inset -2px -2px 6px var(--shadow-light),
+        inset 2px 2px 6px var(--shadow-dark);
+    }
+    .modal-btn-confirmar {
+      background: var(--blue);
+      color: #FFFFFF;
+      box-shadow:
+        -2px -2px 8px rgba(0,122,255,0.25),
+        3px 3px 10px rgba(0,122,255,0.35);
+    }
+    .modal-btn-confirmar:active {
+      transform: scale(0.96);
+    }
+    .modal-btn-confirmar:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     .ripple {
@@ -484,7 +576,8 @@
     </div>
     <div class="titulo-app">
       <h1>Cicada <span>3301</span></h1>
-    </div><div class="pildora-porcentaje" id="pildoraIVA">
+    </div>
+    <div class="pildora-porcentaje" id="pildoraIVA">
       <label>IVA</label>
       <div class="contenedor-numero">
         <input type="text" id="inputIVA" placeholder="0" inputmode="decimal">
@@ -550,27 +643,42 @@
       <div class="fila-dato"><span class="etiqueta">Ingreso total</span><span class="valor" id="ingresoPaquete">₡0</span></div>
       <div class="fila-dato"><span class="etiqueta">Ganancia por paquete</span><span class="valor" id="gananciaPaquete">₡0</span></div>
     </div>
-
-    <div class="historial-container">
-      <button class="btn-historial" id="btnHistorial">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 3v5h5"></path>
-          <path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"></path>
-          <path d="M12 7v5l4 2"></path>
-        </svg>
-        <span>Ver historial</span>
-      </button>
-      <div id="historialLista" class="historial-lista">
-        <div class="historial-empty">Aún sin cálculos</div>
-      </div>
-    </div>
   </div>
 
+  <div class="registrar-container">
+    <button class="btn-registrar" id="btnRegistrar">
+      <span>Registrar</span>
+    </button>
+  </div>
+
+</div>
+
+<div class="modal-overlay" id="modalRegistrar">
+  <div class="modal-box">
+    <div class="modal-title">Registrar producto</div>
+
+    <div class="modal-field">
+      <label for="registrarNombre">Nombre del producto</label>
+      <input type="text" id="registrarNombre" placeholder="Ej: Coca Cola 3L" autocomplete="off">
+    </div>
+
+    <div class="modal-resumen" id="modalResumen">
+      <div class="fila"><span class="k">Compra</span><span class="v" id="resumenCompra">—</span></div>
+      <div class="fila"><span class="k">Venta</span><span class="v" id="resumenVenta">—</span></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancelar" id="btnCancelarRegistrar">Cancelar</button>
+      <button class="modal-btn modal-btn-confirmar" id="btnConfirmarRegistrar">Registrar</button>
+    </div>
+  </div>
 </div>
 
 <script>
   (function() {
     'use strict';
+
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxe4L4Z76NIBjDKxDp_t579_94XJEDAo1pO-JYr_aPwm0j3OvPgHvNiwVf-yd6xoURc/exec';
 
     const contenedorApp = document.getElementById('appContainer');
     const inputP = document.getElementById('inputPaquete');
@@ -593,8 +701,6 @@
     const spanCosto = document.getElementById('textoCostoAuto');
     const badgeUnidad = document.getElementById('badgeUnidad');
     const barraUnidad = document.getElementById('barraUnidad');
-    const historialLista = document.getElementById('historialLista');
-    const btnHistorial = document.getElementById('btnHistorial');
 
     const etiquetasUnidad = {
       bajo: document.getElementById('etiqUnidadBajo'),
@@ -602,9 +708,19 @@
       optimo: document.getElementById('etiqUnidadOptimo')
     };
 
-    let historial = [];
-    let ultimoRegistroGuardado = null;
+    // Elementos del modal de registro
+    const btnRegistrar = document.getElementById('btnRegistrar');
+    const modalRegistrar = document.getElementById('modalRegistrar');
+    const registrarNombre = document.getElementById('registrarNombre');
+    const resumenCompra = document.getElementById('resumenCompra');
+    const resumenVenta = document.getElementById('resumenVenta');
+    const btnCancelarRegistrar = document.getElementById('btnCancelarRegistrar');
+    const btnConfirmarRegistrar = document.getElementById('btnConfirmarRegistrar');
+
     let timeoutId;
+    let ultimoCostoCalculado = null;
+    let ultimoVentaCalculado = null;
+    let registroExitoso = false;
 
     function formatearPorcentaje(p) {
       const redondeado = Math.round(p * 10) / 10;
@@ -633,7 +749,6 @@
       activarLevitacion(pildoraIVA);
     }
 
-    // ---------- GUARDAR Y RESTAURAR ESTADO DE LOS CAMPOS ----------
     function guardarEstadoCampos() {
       try {
         const estado = {
@@ -728,49 +843,6 @@
       setTimeout(function() { span.remove(); }, 650);
     }
 
-    function cargarHistorial() {
-      try {
-        const data = localStorage.getItem('pulhHistorial');
-        if (data) historial = JSON.parse(data);
-      } catch (e) { historial = []; }
-    }
-    function guardarHistorial() {
-      try { localStorage.setItem('pulhHistorial', JSON.stringify(historial)); } catch (e) {}
-    }
-
-    function agregarAlHistorial(costo, venta, porcentaje) {
-      const nuevoRegistro = { costo, venta, porcentaje };
-      if (ultimoRegistroGuardado &&
-          ultimoRegistroGuardado.costo === nuevoRegistro.costo &&
-          ultimoRegistroGuardado.venta === nuevoRegistro.venta &&
-          ultimoRegistroGuardado.porcentaje === nuevoRegistro.porcentaje) return;
-      historial.unshift(nuevoRegistro);
-      if (historial.length > 20) historial.pop();
-      ultimoRegistroGuardado = nuevoRegistro;
-      guardarHistorial();
-      actualizarVistaHistorial();
-    }
-
-    function actualizarVistaHistorial() {
-      historialLista.innerHTML = '';
-      if (historial.length === 0) {
-        historialLista.innerHTML = '<div class="historial-empty">Aún sin cálculos</div>';
-        return;
-      }
-      historial.forEach(function(item) {
-        const div = document.createElement('div');
-        div.className = 'item-historial';
-        div.innerHTML = '<span class="left">' + item.costo + ' → ' + item.venta + '</span>' +
-                        '<span class="right">' + item.porcentaje + '</span>';
-        historialLista.appendChild(div);
-      });
-    }
-
-    btnHistorial.addEventListener('click', function(e) {
-      lanzarRipple(e);
-      historialLista.classList.toggle('abierto');
-    });
-
     function setFocus(grupoId) {
       Object.values(grupos).forEach(function(el) {
         el.classList.remove('active', 'inactive');
@@ -803,7 +875,8 @@
       grupos.costo.classList.remove('levitando');
       document.getElementById('bloqueUnidad').classList.add('oculto');
       document.getElementById('bloquePaquete').classList.add('oculto');
-      ultimoRegistroGuardado = null;
+      ultimoCostoCalculado = null;
+      ultimoVentaCalculado = null;
     }
 
     function calcular() {
@@ -832,15 +905,18 @@
       spanCosto.innerText = formatCRNumber(costoUnitario);
       grupos.costo.style.display = 'block';
       grupos.costo.classList.add('levitando');
+      ultimoCostoCalculado = costoUnitario;
 
       if (isNaN(sell) || sell <= 0) {
         document.getElementById('bloqueUnidad').classList.add('oculto');
         document.getElementById('bloquePaquete').classList.add('oculto');
         areaResultados.style.display = 'block';
+        ultimoVentaCalculado = null;
         return;
       }
 
       areaResultados.style.display = 'block';
+      ultimoVentaCalculado = sell;
 
       const gananciaUnidad = sell - costoUnitario;
       const porcentajeUnidad = (gananciaUnidad / sell) * 100;
@@ -866,8 +942,6 @@
       } else {
         document.getElementById('bloquePaquete').classList.add('oculto');
       }
-
-      agregarAlHistorial(formatCRNumber(costoUnitario), formatCRNumber(sell), formatearPorcentaje(porcentajeUnidad));
     }
 
     function scheduleCalculation() {
@@ -886,37 +960,149 @@
       }
     }
 
+    // ============================================================
+    // BOTÓN REGISTRAR → ESTADOS
+    // ============================================================
+    function marcarRegistrado() {
+      registroExitoso = true;
+      btnRegistrar.classList.add('guardado');
+      btnRegistrar.disabled = true;
+      btnRegistrar.querySelector('span').innerText = 'Guardado';
+    }
+
+    function resetearRegistrado() {
+      if (!registroExitoso) return;
+      registroExitoso = false;
+      btnRegistrar.classList.remove('guardado');
+      btnRegistrar.disabled = false;
+      btnRegistrar.querySelector('span').innerText = 'Registrar';
+    }
+
+    // ============================================================
+    // MODAL DE REGISTRO
+    // ============================================================
+    function abrirModalRegistrar(e) {
+      if (registroExitoso) return;
+      lanzarRipple(e);
+
+      // Cargar resumen de datos calculados
+      resumenCompra.innerText = (ultimoCostoCalculado && isFinite(ultimoCostoCalculado))
+        ? formatCRNumber(ultimoCostoCalculado)
+        : '—';
+      resumenVenta.innerText = (ultimoVentaCalculado && isFinite(ultimoVentaCalculado))
+        ? formatCRNumber(ultimoVentaCalculado)
+        : '—';
+
+      // Limpiar campo de nombre
+      registrarNombre.value = '';
+
+      modalRegistrar.classList.add('show');
+
+      setTimeout(function() {
+        registrarNombre.focus();
+      }, 300);
+    }
+
+    function cerrarModalRegistrar() {
+      modalRegistrar.classList.remove('show');
+    }
+
+    function enviarRegistro() {
+      const nombre = registrarNombre.value.trim();
+      if (!nombre) {
+        registrarNombre.focus();
+        return;
+      }
+
+      // Datos a enviar: solo nombre, y si hay datos calculados, costo y venta.
+      const payload = {
+        action: 'registrarProducto',
+        nombre: nombre,
+        costo: (ultimoCostoCalculado && isFinite(ultimoCostoCalculado)) ? ultimoCostoCalculado : '',
+        precioVenta: (ultimoVentaCalculado && isFinite(ultimoVentaCalculado)) ? ultimoVentaCalculado : ''
+      };
+
+      btnConfirmarRegistrar.disabled = true;
+      btnConfirmarRegistrar.innerText = 'Enviando...';
+
+      fetch(API_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      })
+      .then(function() {
+        // Con no-cors no podemos leer la respuesta, pero se asume éxito si no lanza error.
+        cerrarModalRegistrar();
+        marcarRegistrado();
+        btnConfirmarRegistrar.disabled = false;
+        btnConfirmarRegistrar.innerText = 'Registrar';
+      })
+      .catch(function() {
+        btnConfirmarRegistrar.disabled = false;
+        btnConfirmarRegistrar.innerText = 'Registrar';
+        alert('No se pudo registrar. Revisá tu conexión.');
+      });
+    }
+
+    btnRegistrar.addEventListener('click', abrirModalRegistrar);
+    btnCancelarRegistrar.addEventListener('click', function(e) {
+      lanzarRipple(e);
+      cerrarModalRegistrar();
+    });
+    btnConfirmarRegistrar.addEventListener('click', enviarRegistro);
+
+    modalRegistrar.addEventListener('click', function(ev) {
+      if (ev.target === this) cerrarModalRegistrar();
+    });
+
+    registrarNombre.addEventListener('keydown', function(ev) {
+      if (ev.key === 'Enter') {
+        ev.preventDefault();
+        enviarRegistro();
+      }
+    });
+
+    // ============================================================
+    // EVENTOS DE INPUT
+    // ============================================================
     inputP.addEventListener('input', function() {
       applyLiveFormatting(this);
       activarLevitacion(grupos.paquete);
       scheduleCalculation();
       guardarEstadoCampos();
+      resetearRegistrado();
     });
     inputDescuento.addEventListener('input', function() {
       activarLevitacion(pildoraDescuento);
       scheduleCalculation();
       guardarEstadoCampos();
+      resetearRegistrado();
     });
     inputIVA.addEventListener('input', function() {
       activarLevitacion(pildoraIVA);
       scheduleCalculation();
       guardarEstadoCampos();
+      resetearRegistrado();
     });
     inputC.addEventListener('input', function() {
       this.value = this.value.replace(/[^\d]/g, '');
       activarLevitacion(grupos.cantidad);
       scheduleCalculation();
       guardarEstadoCampos();
+      resetearRegistrado();
     });
     inputV.addEventListener('input', function() {
       applyLiveFormatting(this);
       activarLevitacion(grupos.venta);
       scheduleCalculation();
       guardarEstadoCampos();
+      resetearRegistrado();
     });
 
-    cargarHistorial();
-    actualizarVistaHistorial();
+    // ============================================================
+    // INICIALIZACIÓN
+    // ============================================================
     limpiarUI();
     restaurarEstadoCampos();
     actualizarTodasLasLevitaciones();
