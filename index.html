@@ -362,10 +362,20 @@
     .barra-etiqueta.activa.verde { color: var(--green-deep); }
     .barra-etiqueta.activa.azul { color: var(--blue); }
 
-    /* BOTÓN REGISTRAR (mismo estilo que el viejo Ver historial) */
+    /* BOTÓN REGISTRAR */
     .registrar-container {
       text-align: center;
       margin-top: 12px;
+      /* Oculto por defecto. Se muestra solo cuando los 4 campos tienen datos. */
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .registrar-container.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
     }
     .btn-registrar {
       position: relative;
@@ -398,11 +408,6 @@
     }
     .btn-registrar.guardado {
       color: var(--green-deep);
-      box-shadow:
-        -4px -4px 10px var(--shadow-light),
-        4px 4px 10px var(--shadow-dark-strong),
-        0 0 0 rgba(0,0,0,0),
-        inset 1px 1px 0 var(--highlight-edge);
     }
     .btn-registrar:disabled {
       cursor: default;
@@ -562,7 +567,8 @@
       * { transition: none !important; animation: none !important; }
     }
   </style>
-</head><body>
+</head>
+<body>
 
 <div class="contenedor" id="appContainer">
 
@@ -645,7 +651,7 @@
     </div>
   </div>
 
-  <div class="registrar-container">
+  <div class="registrar-container" id="registrarContainer">
     <button class="btn-registrar" id="btnRegistrar">
       <span>Registrar</span>
     </button>
@@ -708,7 +714,7 @@
       optimo: document.getElementById('etiqUnidadOptimo')
     };
 
-    // Elementos del modal de registro
+    const registrarContainer = document.getElementById('registrarContainer');
     const btnRegistrar = document.getElementById('btnRegistrar');
     const modalRegistrar = document.getElementById('modalRegistrar');
     const registrarNombre = document.getElementById('registrarNombre');
@@ -879,6 +885,29 @@
       ultimoVentaCalculado = null;
     }
 
+    // ============================================================
+    // VISIBILIDAD DEL BOTÓN REGISTRAR
+    // Solo se muestra cuando los 4 campos tienen datos válidos.
+    // ============================================================
+    function actualizarVisibilidadRegistrar() {
+      const precioBase = parseCRNumber(inputP.value);
+      const qty = parseCRNumber(inputC.value);
+      const sell = parseCRNumber(inputV.value);
+
+      const tienePrecio = !isNaN(precioBase) && precioBase > 0;
+      const tieneCantidad = !isNaN(qty) && qty > 0;
+      const tieneVenta = !isNaN(sell) && sell > 0;
+      const tieneCosto = ultimoCostoCalculado !== null && isFinite(ultimoCostoCalculado) && ultimoCostoCalculado > 0;
+
+      const todosLlenos = tienePrecio && tieneCantidad && tieneVenta && tieneCosto;
+
+      if (todosLlenos) {
+        registrarContainer.classList.add('visible');
+      } else {
+        registrarContainer.classList.remove('visible');
+      }
+    }
+
     function calcular() {
       const precioBase = parseCRNumber(inputP.value);
       const descuento = parseFloat(inputDescuento.value);
@@ -888,6 +917,7 @@
 
       if (isNaN(precioBase) || isNaN(qty) || qty <= 0) {
         limpiarUI();
+        actualizarVisibilidadRegistrar();
         return;
       }
 
@@ -912,6 +942,7 @@
         document.getElementById('bloquePaquete').classList.add('oculto');
         areaResultados.style.display = 'block';
         ultimoVentaCalculado = null;
+        actualizarVisibilidadRegistrar();
         return;
       }
 
@@ -942,6 +973,8 @@
       } else {
         document.getElementById('bloquePaquete').classList.add('oculto');
       }
+
+      actualizarVisibilidadRegistrar();
     }
 
     function scheduleCalculation() {
@@ -960,9 +993,6 @@
       }
     }
 
-    // ============================================================
-    // BOTÓN REGISTRAR → ESTADOS
-    // ============================================================
     function marcarRegistrado() {
       registroExitoso = true;
       btnRegistrar.classList.add('guardado');
@@ -978,14 +1008,10 @@
       btnRegistrar.querySelector('span').innerText = 'Registrar';
     }
 
-    // ============================================================
-    // MODAL DE REGISTRO
-    // ============================================================
     function abrirModalRegistrar(e) {
       if (registroExitoso) return;
       lanzarRipple(e);
 
-      // Cargar resumen de datos calculados
       resumenCompra.innerText = (ultimoCostoCalculado && isFinite(ultimoCostoCalculado))
         ? formatCRNumber(ultimoCostoCalculado)
         : '—';
@@ -993,7 +1019,6 @@
         ? formatCRNumber(ultimoVentaCalculado)
         : '—';
 
-      // Limpiar campo de nombre
       registrarNombre.value = '';
 
       modalRegistrar.classList.add('show');
@@ -1014,7 +1039,6 @@
         return;
       }
 
-      // Datos a enviar: solo nombre, y si hay datos calculados, costo y venta.
       const payload = {
         action: 'registrarProducto',
         nombre: nombre,
@@ -1032,7 +1056,6 @@
         body: JSON.stringify(payload)
       })
       .then(function() {
-        // Con no-cors no podemos leer la respuesta, pero se asume éxito si no lanza error.
         cerrarModalRegistrar();
         marcarRegistrado();
         btnConfirmarRegistrar.disabled = false;
@@ -1063,9 +1086,6 @@
       }
     });
 
-    // ============================================================
-    // EVENTOS DE INPUT
-    // ============================================================
     inputP.addEventListener('input', function() {
       applyLiveFormatting(this);
       activarLevitacion(grupos.paquete);
@@ -1100,9 +1120,6 @@
       resetearRegistrado();
     });
 
-    // ============================================================
-    // INICIALIZACIÓN
-    // ============================================================
     limpiarUI();
     restaurarEstadoCampos();
     actualizarTodasLasLevitaciones();
