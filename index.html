@@ -3,12 +3,12 @@
 <head>
 <base target="_top">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
 <title>Cicada 3301 - Calculadora</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icono-192.png">
 <link rel="apple-touch-icon" href="icono-192.png">
-<meta name="theme-color" content="#0E1113">
+<meta name="theme-color" content="#030506">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -30,33 +30,30 @@
 --txt-azul: #3D9BFF;
 --pill-bg: linear-gradient(180deg,#13171A,#0C0E10) padding-box, linear-gradient(225deg,rgba(60,200,165,.60),rgba(255,255,255,.05) 40%,rgba(255,255,255,.03) 62%,rgba(80,110,230,.55)) border-box;
 --pill-shadow: 0 12px 26px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.04);
---pill-sunken: inset 4px 4px 12px rgba(0,0,0,.75), inset -3px -3px 8px rgba(255,255,255,.03);
---pill-active: 0 18px 38px rgba(0,0,0,.8), 0 6px 14px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06);
+--pill-raised: 0 14px 28px rgba(0,0,0,.75), 0 3px 6px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.10), inset 0 -2px 4px rgba(0,0,0,.45);
+--pill-sunken: inset 4px 4px 12px rgba(0,0,0,.9), inset -1px -1px 3px rgba(255,255,255,.04);
+--pill-active: 0 22px 40px rgba(0,0,0,.85), 0 6px 12px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.12);
 --pressed: inset 2px 2px 6px rgba(0,0,0,.8), inset -1px -1px 3px rgba(255,255,255,.03);
 --divider: rgba(255,255,255,.08);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html { -webkit-tap-highlight-color: transparent; background: #060708; }
-body::before {
-content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-background:
- url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
- radial-gradient(ellipse 120% 90% at 50% 45%, transparent 55%, rgba(0,0,0,.6) 100%),
- radial-gradient(560px 460px at 110% -10%, rgba(40,170,140,.26), transparent 70%),
- radial-gradient(520px 460px at -10% 110%, rgba(60,90,200,.24), transparent 70%),
- linear-gradient(180deg,#0E1113 0%,#060708 100%);
-}
+html { -webkit-tap-highlight-color: transparent; background: #030506; height: 100%; }
 body {
 font-family: 'Inter', sans-serif;
-min-height: 100vh;
-background: transparent;
+height: 100%;
+overflow: hidden;
+background: #030506;
 color: var(--ink);
-display: flex;
-justify-content: center;
-padding: 22px 20px 40px;
 }
-.contenedor { width: 100%; max-width: 420px; }
+/* PANTALLA FLOTANTE */
+.marco { position: fixed; top: calc(7px + env(safe-area-inset-top, 0px)); bottom: calc(7px + env(safe-area-inset-bottom, 0px)); left: 7px; right: 7px; border-radius: 30px; overflow: hidden; isolation: isolate; background: #020304; box-shadow: 0 0 0 1px rgba(255,255,255,.05), 0 14px 34px rgba(0,0,0,.9); }
+#mosaico { position: absolute; top: 0; left: 0; width: 100%; display: block; pointer-events: none; }
+.marco-scroll { position: absolute; inset: 0; z-index: 1; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 22px 20px 70px; }
+.marco-curva { position: absolute; inset: 0; z-index: 2; border-radius: 30px; pointer-events: none;
+background: linear-gradient(180deg,rgba(255,255,255,.21) 0,rgba(255,255,255,.065) 10px,transparent 39px), linear-gradient(0deg,rgba(0,0,0,.97) 0,rgba(0,0,0,.39) 21px,transparent 62px), linear-gradient(90deg,rgba(0,0,0,.91) 0,rgba(0,0,0,.33) 12px,rgba(255,255,255,.065) 20px,transparent 44px), linear-gradient(270deg,rgba(0,0,0,.91) 0,rgba(0,0,0,.33) 12px,rgba(255,255,255,.065) 20px,transparent 44px);
+box-shadow: inset 0 1px 0 rgba(255,255,255,.23); }
+.contenedor { width: 100%; max-width: 420px; margin: 0 auto; }
 .titulo-con-pildoras { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 28px; margin-top: 6px; }
 .titulo-app { flex: 1; text-align: center; }
 .titulo-app h1 { margin: 0; font-family: 'Fraunces', serif; font-size: 24px; font-weight: 700; letter-spacing: 0.2px; color: #F2F2F4; }
@@ -65,15 +62,15 @@ padding: 22px 20px 40px;
 .pildora-porcentaje {
 display: flex; flex-direction: column; align-items: center;
 border: 1px solid transparent; background: var(--pill-bg); border-radius: 16px; padding: 5px 11px 5px 11px; flex-shrink: 0;
-box-shadow: inset 3px 3px 8px rgba(0,0,0,.75), inset -2px -2px 5px rgba(255,255,255,.03);
+box-shadow: var(--pill-sunken);
 transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .pildora-porcentaje.levitando {
-box-shadow: var(--pill-shadow);
+box-shadow: var(--pill-raised);
 transform: translateY(-1px);
 }
 .pildora-porcentaje:focus-within {
-box-shadow: 0 16px 32px rgba(0,0,0,.75), 0 4px 10px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06);
+box-shadow: var(--pill-active);
 transform: translateY(-2px);
 }
 .pildora-porcentaje label { font-size: 9px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
@@ -87,7 +84,7 @@ box-shadow: var(--pill-sunken);
 transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
 }
 .grupo-input.levitando {
-box-shadow: var(--pill-shadow);
+box-shadow: var(--pill-raised);
 transform: translateY(-1px);
 }
 .grupo-input.active {
@@ -108,7 +105,7 @@ input::placeholder { color: var(--ink-soft); opacity: 0.5; }
 #areaResultados { margin-top: 12px; display: none; }
 .bloque-resultado {
 border: 1px solid transparent; background: var(--pill-bg); border-radius: 18px; padding: 17px 19px; margin-bottom: 18px;
-box-shadow: var(--pill-shadow);
+box-shadow: var(--pill-raised);
 transition: opacity 0.4s ease, transform 0.4s ease, box-shadow 0.4s ease;
 }
 .oculto { opacity: 0; transform: translateY(-15px); pointer-events: none; }
@@ -143,10 +140,10 @@ transition: opacity 0.4s ease, transform 0.4s ease, box-shadow 0.4s ease;
 position: relative; overflow: hidden; display: inline-flex; align-items: center; gap: 8px;
 border: 1px solid transparent; background: var(--pill-bg); border-radius: 14px; padding: 11px 21px;
 font-family: 'Inter', sans-serif; font-size: 13.5px; font-weight: 600; color: var(--ink); cursor: pointer;
-box-shadow: var(--pill-shadow);
+box-shadow: var(--pill-raised);
 transition: all 0.2s ease; isolation: isolate;
 }
-.btn-registrar:active { box-shadow: var(--pressed); transform: translateY(1px); }
+.btn-registrar:active { box-shadow: var(--pill-sunken); transform: translateY(1px); }
 .btn-registrar.guardado { color: var(--green-deep); }
 .btn-registrar:disabled { cursor: default; }
 
@@ -177,6 +174,9 @@ transition: all 0.2s ease; isolation: isolate;
 </style>
 </head>
 <body>
+<div class="marco" id="marco">
+<canvas id="mosaico"></canvas>
+<div class="marco-scroll" id="marcoScroll">
 <div class="contenedor" id="appContainer">
 <div class="titulo-con-pildoras">
 <div class="pildora-porcentaje" id="pildoraDescuento">
@@ -255,6 +255,9 @@ transition: all 0.2s ease; isolation: isolate;
 <span>Registrar</span>
 </button>
 </div>
+</div>
+</div>
+<div class="marco-curva"></div>
 </div>
 
 <div class="modal-overlay" id="modalRegistrar">
@@ -674,6 +677,72 @@ restaurarEstadoCampos();
 actualizarTodasLasLevitaciones();
 calcular();
 
+})();
+</script>
+<script>
+// FONDO MOSAICO Y SCROLL INTERNO DEL MARCO
+(function() {
+'use strict';
+
+function paintMosaic(cv){
+ const t={lo:[7,17,15],hi:[30,92,76],edge:"rgba(150,230,200,"};
+ const dpr=Math.min(devicePixelRatio||1,3),W=cv.clientWidth,H=cv.clientHeight;
+ cv.width=W*dpr;cv.height=H*dpr;const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+ ctx.fillStyle='#020304';ctx.fillRect(0,0,W,H);
+ let sd=3301;const R=()=>{sd=(sd*16807)%2147483647;return(sd-1)/2147483646};
+ const rr=(x,y,w,h,r)=>{ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()};
+ const cell=23,gap=3,s=cell-gap,cols=Math.ceil(W/cell)+1,rows=Math.ceil(H/cell)+1,ox=(W-cols*cell)/2,oy=-4;
+ const N=6,gw=Math.ceil(cols/N)+2,gh=Math.ceil(rows/N)+2,grid=[];for(let i=0;i<gw*gh;i++)grid.push(R());
+ const sm=v=>v*v*(3-2*v),noise=(c,r)=>{const x=c/N,y=r/N,x0=Math.floor(x),y0=Math.floor(y),fx=sm(x-x0),fy=sm(y-y0),g=(a,b)=>grid[b*gw+a];return(g(x0,y0)*(1-fx)+g(x0+1,y0)*fx)*(1-fy)+(g(x0,y0+1)*(1-fx)+g(x0+1,y0+1)*fx)*fy};
+ const tiles=[];
+ for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const x=ox+c*cell,y=oy+r*cell,ny=(y+s/2)/H-.5,nx=(x+s/2)/W-.5;
+  const vig=Math.max(0,1-Math.pow(Math.abs(ny)*1.9,2)-Math.pow(Math.abs(nx)*1.1,2)*.6);
+  let v=(noise(c,r)*.5+Math.pow(R(),1.6)*.65)*(.18+.8*vig);v=Math.max(0,Math.min(1,v));tiles.push({x,y,v,up:v>.32&&R()<.8})}
+ const col=v=>`rgb(${t.lo.map((l,i)=>Math.round(l+(t.hi[i]-l)*v)).join(',')})`;
+ tiles.forEach(T=>{rr(T.x,T.y,s,s,4);ctx.fillStyle=col(T.v);ctx.fill()});
+ ctx.save();ctx.shadowColor='rgba(0,0,0,.85)';ctx.shadowBlur=14;ctx.shadowOffsetX=10006;ctx.shadowOffsetY=7;
+ tiles.forEach(T=>{if(!T.up)return;rr(T.x-10000,T.y,s,s,4);ctx.fillStyle='#000';ctx.fill()});ctx.restore();
+ tiles.forEach(T=>{rr(T.x,T.y,s,s,4);if(T.up){ctx.fillStyle=col(Math.min(1,T.v*1.08));ctx.fill()}
+  const g=ctx.createLinearGradient(0,T.y,0,T.y+s);g.addColorStop(0,'rgba(255,255,255,'+(.05+T.v*.06)+')');g.addColorStop(.5,'rgba(255,255,255,0)');g.addColorStop(1,'rgba(0,0,0,.18)');ctx.fillStyle=g;ctx.fill();
+  ctx.lineWidth=1;ctx.strokeStyle=t.edge+(.05+T.v*.16)+')';rr(T.x+.5,T.y+.5,s-1,s-1,3.6);ctx.stroke()});
+ const vg=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.35,W/2,H/2,Math.max(W,H)*.75);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.55)');ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
+}
+
+const marco = document.getElementById('marco');
+const marcoScroll = document.getElementById('marcoScroll');
+const lienzo = document.getElementById('mosaico');
+let anchoPintado = 0;
+let altoPintado = 0;
+let timeoutMosaico;
+
+// Solo se redibuja si cambia el ancho o crece el alto; al abrir el teclado el mosaico queda quieto
+function ajustarMosaico() {
+const W = marco.clientWidth;
+const H = marco.clientHeight;
+if (W === anchoPintado && H <= altoPintado) return;
+altoPintado = (W === anchoPintado) ? Math.max(altoPintado, H) : H;
+anchoPintado = W;
+lienzo.style.height = altoPintado + 'px';
+paintMosaic(lienzo);
+}
+
+// Con el teclado abierto, mantener a la vista el campo en uso dentro del marco
+function mantenerCampoVisible() {
+const el = document.activeElement;
+if (el && el.tagName === 'INPUT' && marcoScroll.contains(el)) {
+el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+}
+}
+
+function alCambiarTamano() {
+clearTimeout(timeoutMosaico);
+timeoutMosaico = setTimeout(function() { ajustarMosaico(); mantenerCampoVisible(); }, 120);
+}
+
+if (window.ResizeObserver) { new ResizeObserver(alCambiarTamano).observe(marco); }
+window.addEventListener('resize', alCambiarTamano);
+
+ajustarMosaico();
 })();
 </script>
 </body>
