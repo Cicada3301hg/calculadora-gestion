@@ -47,7 +47,7 @@ background: #030506;
 color: var(--ink);
 }
 /* PANTALLA FLOTANTE */
-.marco { position: fixed; top: calc(7px + env(safe-area-inset-top, 0px)); bottom: calc(7px + env(safe-area-inset-bottom, 0px)); left: calc(7px + env(safe-area-inset-left, 0px)); right: calc(7px + env(safe-area-inset-right, 0px)); border-radius: 30px; overflow: hidden; isolation: isolate; background: #020304; box-shadow: 0 0 0 1px rgba(255,255,255,.05), 0 14px 34px rgba(0,0,0,.9); }
+.marco { position: fixed; top: 7px; bottom: calc(7px + env(safe-area-inset-bottom, 0px)); left: calc(7px + env(safe-area-inset-left, 0px)); right: calc(7px + env(safe-area-inset-right, 0px)); border-radius: 30px; overflow: hidden; isolation: isolate; background: #020304; box-shadow: 0 0 0 1px rgba(255,255,255,.05), 0 14px 34px rgba(0,0,0,.9); }
 #mosaico { position: absolute; top: 0; left: 0; width: 100%; display: block; pointer-events: none; }
 .marco-scroll { position: absolute; inset: 0; z-index: 1; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 40px 20px 70px; }
 .marco-curva { position: absolute; inset: 0; z-index: 2; border-radius: 30px; pointer-events: none;
