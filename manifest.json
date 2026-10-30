@@ -3,8 +3,8 @@
   "short_name": "Cicada 3301",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#EEF0F3",
-  "theme_color": "#EEF0F3",
+  "background_color": "#0E1113",
+  "theme_color": "#0E1113",
   "icons": [
     {
       "src": "icono-192.png",
