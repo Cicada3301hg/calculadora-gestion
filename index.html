@@ -128,6 +128,18 @@ transition: opacity 0.4s ease, transform 0.4s ease, box-shadow 0.4s ease;
 .barra-progreso.rojo { background: var(--brick); }
 .barra-progreso.verde { background: var(--green); }
 .barra-progreso.azul { background: var(--blue); }
+/* BARRA QUE SE ARRASTRA Y PRECIO SUGERIDO */
+.barra-zona { position: absolute; left: 0; right: 0; top: -14px; height: 34px; z-index: 2; touch-action: none; cursor: pointer; }
+.barra-perilla { position: absolute; top: 3px; left: 0%; width: 36px; height: 20px; z-index: 1; pointer-events: none; transform: translate(-50%, -50%); transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.15s ease; --stb: var(--green); }
+.barra-perilla svg { display: block; width: 36px; height: 20px; }
+.barra-perilla.rojo { --stb: var(--brick); }
+.barra-perilla.verde { --stb: var(--green); }
+.barra-perilla.azul { --stb: var(--blue); }
+.barra-wrapper.arrastrando .barra-progreso { transition: none; }
+.barra-wrapper.arrastrando .barra-perilla { transition: transform 0.15s ease; transform: translate(-50%, -50%) scale(1.1); }
+.etiqueta-sugerido { display: none; flex-shrink: 0; margin-left: 8px; font-family: 'Inter', sans-serif; font-size: 9.5px; font-weight: 600; letter-spacing: 0.3px; color: #8E979F; }
+.grupo-input.automatico .etiqueta-sugerido { display: inline; }
+.grupo-input.automatico input { color: #B9C2CA; }
 .barra-etiquetas { position: absolute; top: 12px; left: 0; right: 0; height: 14px; pointer-events: none; }
 .barra-etiqueta { position: absolute; transform: translateX(-50%); font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.3px; color: var(--ink-soft); opacity: 0.55; transition: opacity 0.3s, color 0.3s; white-space: nowrap; }
 .barra-etiqueta.activa { opacity: 1; font-weight: 700; }
@@ -224,6 +236,7 @@ transition: all 0.2s ease; isolation: isolate;
 <div class="input-wrapper">
 <span class="simbolo">₡</span>
 <input type="text" id="inputVenta" placeholder="0" inputmode="decimal">
+<span class="etiqueta-sugerido">sugerido</span>
 </div>
 </div>
 <div id="areaResultados">
@@ -233,8 +246,10 @@ transition: all 0.2s ease; isolation: isolate;
 <span id="badgeUnidad" class="badge-porcentaje">0%</span>
 </div>
 <div class="fila-dato"><span class="etiqueta">Ganancia por unidad</span><span class="valor" id="gananciaUnidad">₡0</span></div>
-<div class="barra-wrapper">
-<div class="barra-progreso-container"><div id="barraUnidad" class="barra-progreso" style="width: 0%;"></div></div>
+<div class="barra-wrapper" id="barraWrapper">
+<div class="barra-progreso-container" id="barraContenedor"><div id="barraUnidad" class="barra-progreso" style="width: 0%;"></div></div>
+<div class="barra-perilla" id="perillaUnidad"><svg viewBox="0 0 36 20" style="overflow:visible;filter:drop-shadow(0 4px 4px rgba(0,0,0,.9)) drop-shadow(0 0 4px rgba(255,255,255,.10))"><defs><linearGradient id="m3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EEF1F4"/><stop offset=".45" stop-color="#A1AAB4"/><stop offset=".55" stop-color="#7F8994"/><stop offset="1" stop-color="#CBD1D7"/></linearGradient><linearGradient id="b3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".5"/></linearGradient><radialGradient id="h3" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="#F4F6F8"/><stop offset=".6" stop-color="#9AA3AD"/><stop offset="1" stop-color="#5E6873"/></radialGradient></defs><path d="M9 2.5 Q5.5 7.5 0.6 10 Q5.5 12.5 9 17.5 L11.6 17.5 Q8.2 12.6 4.8 10 Q8.2 7.4 11.6 2.5 Z" fill="url(#m3)" stroke="url(#b3)" stroke-width=".8" stroke-linejoin="round"/><path d="M27 2.5 Q30.5 7.5 35.4 10 Q30.5 12.5 27 17.5 L24.4 17.5 Q27.8 12.6 31.2 10 Q27.8 7.4 24.4 2.5 Z" fill="url(#m3)" stroke="url(#b3)" stroke-width=".8" stroke-linejoin="round"/><path d="M9 10 H27" stroke="#5E6873" stroke-width="2.2" stroke-linecap="round"/><circle cx="18" cy="10" r="6.2" fill="url(#h3)" stroke="url(#b3)" stroke-width=".8"/><circle cx="18" cy="10" r="3.6" fill="none" stroke="#0B0D0F" stroke-width="1.6"/><circle cx="18" cy="10" r="3.6" fill="none" stroke="var(--stb)" stroke-width="1.1" style="filter:drop-shadow(0 0 2.5px var(--stb))"/></svg></div>
+<div class="barra-zona" id="barraZona"></div>
 <div class="barra-etiquetas">
 <span class="barra-etiqueta" data-cat="bajo" id="etiqUnidadBajo" style="left:10%;">Bajo</span>
 <span class="barra-etiqueta" data-cat="saludable" id="etiqUnidadSaludable" style="left:50%;">Saludable</span>
@@ -325,6 +340,13 @@ let timeoutId;
 let ultimoCostoCalculado = null;
 let ultimoVentaCalculado = null;
 let registroExitoso = false;
+let precioAuto = true;
+let metaMargen = 0.30;
+
+const barraWrapper = document.getElementById('barraWrapper');
+const barraContenedor = document.getElementById('barraContenedor');
+const barraZona = document.getElementById('barraZona');
+const perillaUnidad = document.getElementById('perillaUnidad');
 
 function formatearPorcentaje(p) {
 const redondeado = Math.round(p * 10) / 10;
@@ -349,7 +371,7 @@ activarLevitacion(pildoraIVA);
 
 function guardarEstadoCampos() {
 try {
-const estado = { paquete: inputP.value, descuento: inputDescuento.value, iva: inputIVA.value, cantidad: inputC.value, venta: inputV.value };
+const estado = { paquete: inputP.value, descuento: inputDescuento.value, iva: inputIVA.value, cantidad: inputC.value, venta: inputV.value, ventaAuto: precioAuto, meta: metaMargen };
 localStorage.setItem('pulhEstadoCampos', JSON.stringify(estado));
 } catch (e) {}
 }
@@ -364,7 +386,35 @@ inputDescuento.value = estado.descuento || '';
 inputIVA.value = estado.iva || '';
 inputC.value = estado.cantidad || '';
 inputV.value = estado.venta || '';
+// Estados guardados antes de existir el sugerido: un precio guardado se trata como escrito por el usuario
+precioAuto = (typeof estado.ventaAuto === 'boolean') ? estado.ventaAuto : !estado.venta;
+if (typeof estado.meta === 'number' && isFinite(estado.meta)) { metaMargen = estado.meta; }
 } catch (e) {}
+}
+
+// ============================================================
+// PRECIO SUGERIDO: costo ÷ (1 − meta), hacia arriba a múltiplo de 25
+// ============================================================
+function precioSugerido(costo, meta) {
+const m = Math.min(Math.max(meta, 0), 0.95);
+return Math.ceil((costo / (1 - m)) / 25) * 25;
+}
+
+function formatearEntero(num) {
+return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+function marcarPrecioAuto() {
+grupos.venta.classList.toggle('automatico', precioAuto && inputV.value.trim() !== '');
+}
+
+// Devuelve true si el precio cambió
+function ponerPrecioSugerido(costo) {
+const nuevo = formatearEntero(precioSugerido(costo, metaMargen));
+if (inputV.value === nuevo) return false;
+inputV.value = nuevo;
+activarLevitacion(grupos.venta);
+return true;
 }
 
 function parseCRNumber(val) {
@@ -438,7 +488,12 @@ document.getElementById(grupoId).classList.add('active');
 
 inputP.addEventListener('focus', function() { setFocus('grupoPaquete'); });
 inputC.addEventListener('focus', function() { setFocus('grupoCantidad'); });
-inputV.addEventListener('focus', function() { setFocus('grupoVenta'); });
+inputV.addEventListener('focus', function() {
+setFocus('grupoVenta');
+// Con el sugerido, lo que se escriba lo reemplaza
+if (precioAuto && inputV.value !== '') { setTimeout(function() { inputV.select(); }, 0); }
+});
+inputV.addEventListener('blur', function() { if (precioAuto) { scheduleCalculation(); } });
 
 document.addEventListener('click', function(e) {
 if (!e.target.closest('.pildora-porcentaje') && !e.target.closest('.grupo-input')) {
@@ -473,9 +528,11 @@ const precioBase = parseCRNumber(inputP.value);
 const descuento = parseFloat(inputDescuento.value);
 const iva = parseFloat(inputIVA.value);
 const qty = parseCRNumber(inputC.value);
-const sell = parseCRNumber(inputV.value);
+let sell = parseCRNumber(inputV.value);
 
 if (isNaN(precioBase) || isNaN(qty) || qty <= 0) {
+if (precioAuto && inputV.value !== '') { inputV.value = ''; activarLevitacion(grupos.venta); }
+marcarPrecioAuto();
 limpiarUI();
 actualizarVisibilidadRegistrar();
 return;
@@ -491,6 +548,14 @@ spanCosto.innerText = formatCRNumber(costoUnitario).replace('₡', '');
 grupos.costo.style.display = 'block';
 grupos.costo.classList.add('levitando');
 ultimoCostoCalculado = costoUnitario;
+
+// Si el usuario acaba de borrar el campo y sigue en él, el sugerido espera a que salga
+const escribiendoVacio = document.activeElement === inputV && inputV.value.trim() === '';
+if (precioAuto && !escribiendoVacio && isFinite(costoUnitario) && costoUnitario > 0) {
+ponerPrecioSugerido(costoUnitario);
+sell = parseCRNumber(inputV.value);
+}
+marcarPrecioAuto();
 
 if (isNaN(sell) || sell <= 0) {
 document.getElementById('bloqueUnidad').classList.add('oculto');
@@ -518,6 +583,8 @@ document.getElementById('gananciaPaquete').innerText = formatCRNumber(gananciaTo
 const colorUnidad = actualizarBarra(porcentajeUnidad, barraUnidad, etiquetasUnidad);
 badgeUnidad.className = 'badge-porcentaje ' + colorUnidad;
 badgeUnidad.innerText = formatearPorcentaje(porcentajeUnidad);
+perillaUnidad.className = 'barra-perilla ' + colorUnidad;
+perillaUnidad.style.left = calcularAnchoBarra(porcentajeUnidad) + '%';
 
 document.getElementById('bloqueUnidad').classList.remove('oculto');
 
@@ -667,11 +734,52 @@ resetearRegistrado();
 
 inputV.addEventListener('input', function() {
 applyLiveFormatting(this);
+// Escrito por el usuario se respeta; vacío vuelve el sugerido
+precioAuto = (this.value.trim() === '');
+marcarPrecioAuto();
 activarLevitacion(grupos.venta);
 scheduleCalculation();
 guardarEstadoCampos();
 resetearRegistrado();
 });
+
+// ============================================================
+// BARRA QUE SE ARRASTRA: posición × 0,60 = margen meta
+// ============================================================
+let arrastrandoBarra = false;
+
+function moverBarraA(clientX) {
+const costo = ultimoCostoCalculado;
+if (!(costo > 0) || !isFinite(costo)) return;
+const rect = barraContenedor.getBoundingClientRect();
+const posicion = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1);
+metaMargen = Math.min(posicion * 0.60, 0.95);
+precioAuto = true;
+if (ponerPrecioSugerido(costo)) {
+if (navigator.vibrate) { try { navigator.vibrate(6); } catch (e) {} }
+resetearRegistrado();
+}
+guardarEstadoCampos();
+calcular();
+}
+
+function terminarArrastre() {
+if (!arrastrandoBarra) return;
+arrastrandoBarra = false;
+barraWrapper.classList.remove('arrastrando');
+}
+
+barraZona.addEventListener('pointerdown', function(e) {
+if (!(ultimoCostoCalculado > 0)) return;
+e.preventDefault();
+arrastrandoBarra = true;
+try { barraZona.setPointerCapture(e.pointerId); } catch (err) {}
+barraWrapper.classList.add('arrastrando');
+moverBarraA(e.clientX);
+});
+barraZona.addEventListener('pointermove', function(e) { if (arrastrandoBarra) moverBarraA(e.clientX); });
+barraZona.addEventListener('pointerup', terminarArrastre);
+barraZona.addEventListener('pointercancel', terminarArrastre);
 
 limpiarUI();
 restaurarEstadoCampos();
