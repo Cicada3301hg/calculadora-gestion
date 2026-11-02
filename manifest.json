@@ -1,6 +1,6 @@
 {
-  "name": "Cicada 3301 - Calculadora",
-  "short_name": "Cicada 3301",
+  "name": "Margen",
+  "short_name": "Margen",
   "start_url": "./index.html",
   "display": "fullscreen",
   "background_color": "#030506",
