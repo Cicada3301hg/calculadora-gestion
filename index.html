@@ -487,7 +487,7 @@ let costoConIVA = precioFinalCompra;
 if (iva > 0) { costoConIVA = precioFinalCompra * (1 + (iva / 100)); }
 const costoUnitario = costoConIVA / qty;
 
-spanCosto.innerText = formatCRNumber(costoUnitario);
+spanCosto.innerText = formatCRNumber(costoUnitario).replace('₡', '');
 grupos.costo.style.display = 'block';
 grupos.costo.classList.add('levitando');
 ultimoCostoCalculado = costoUnitario;
